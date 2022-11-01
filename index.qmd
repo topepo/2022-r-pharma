@@ -22,10 +22,10 @@ knitr:
 
 -   New model type `proportional_hazards()`
 -   New mode `"censored regression"`
--   New engines for 
-    - Parametric models
-    - Semi-parametric models
-    - Tree-based models
+-   New engines for
+    -   Parametric models
+    -   Semi-parametric models
+    -   Tree-based models
 -   Formula interface for all models, including stratification
 
 ## Make a `Surv()` object at the start
@@ -61,10 +61,8 @@ glimpse(time_to_million)
 
 ## Regularized Cox model
 
-:::: {.columns}
-
+::: columns
 ::: {.column width="50%"}
-
 ```{r}
 cox_spec <- proportional_hazards(penalty = 0.01) %>%
   set_engine("glmnet")
@@ -76,12 +74,9 @@ cox_fit <-
 ```{r}
 tidy(cox_fit)
 ```
-
 :::
 
 ::: {.column width="50%"}
-
-
 ```{r}
 #| fig-width: 6
 #| fig-height: 4.25
@@ -89,12 +84,10 @@ tidy(cox_fit)
 #| out-width: 100%
 autoplot(cox_fit, best_penalty = 0.01)
 ```
-
+:::
 :::
 
-:::: 
-
-## Available in censored 
+## Available in censored
 
 All for the mode `"censored regression"`.
 
@@ -112,10 +105,10 @@ All for the mode `"censored regression"`.
 
 ## Prediction with survival models
 
-- For all models:
-  - Survival time via `type = "time"`
-  - Survival probability via `type = "survival"`
-- Depending on the engine: types `"hazard"`, `"quantile"`, and `"linear_pred"`
+-   For all models:
+    -   Survival time via `type = "time"`
+    -   Survival probability via `type = "survival"`
+-   Depending on the engine: types `"hazard"`, `"quantile"`, and `"linear_pred"`
 
 . . .
 
@@ -137,7 +130,6 @@ at_weeks <- seq(1, 50, by = 1 / 2)
 predict(cox_fit, time_to_million[selected_rows, ], type = "time")
 ```
 
-
 ## Predict survival probability
 
 ```{r}
@@ -152,28 +144,20 @@ pred$.pred[[1]]
 
 ## Approximation the survival curve
 
-
-:::: {.columns}
-
+::: columns
 ::: {.column width="50%"}
-
 ```{r}
 pred %>%
   mutate(id = factor(selected_rows)) %>%
   tidyr::unnest(cols = .pred)
 ```
-
 :::
-
-::::
+:::
 
 ## Approximation the survival curve
 
-
-:::: {.columns}
-
+::: columns
 ::: {.column width="50%"}
-
 ```{r}
 #| out-width: '100%'
 #| fig-width: 5.4
@@ -194,47 +178,40 @@ pred %>%
   scale_y_continuous(limits = c(0,1)) +
   theme(legend.position = "top")
 ```
-
 :::
 
 ::: {.column width="50%"}
-
 Unblinded IDs
 
-* 40: _Ant Man_
-* 126: _Elvis & Nixon_
-* 372: _Sorry to Bother You_
-
+-   40: *Ant Man*
+-   126: *Elvis & Nixon*
+-   372: *Sorry to Bother You*
 :::
-
-::::
+:::
 
 ## What's next?
 
-So far, we've done a lot with individual models. 
+So far, we've done a lot with individual models.
 
 We have more to add:
 
-* Performance metrics 
-   - time-dependent ROC curves
-   - Brier scores (time-dependent and integrated)
-   - and so on.
-   
-* Tighter tidymodels integration for model tuning and resampling
-
+-   Performance metrics
+    -   time-dependent ROC curves
+    -   Brier scores (time-dependent and integrated)
+    -   and so on.
+-   Tighter tidymodels integration for model tuning and resampling
 
 # H20 Integration
 
-## Changes 
+## Changes
 
-* new parsnip `'h2o'` engine for many models. 
+-   new parsnip `'h2o'` engine for many models.
 
-  - See [here](https://agua.tidymodels.org/articles/agua.html) for a complete list.
+    -   See [here](https://agua.tidymodels.org/articles/agua.html) for a complete list.
 
-* The interactions between H2O and tidymodels are minimized so that there are few expensive data transfer penalties. 
+-   The interactions between H2O and tidymodels are minimized so that there are few expensive data transfer penalties.
 
-* We've added som wrappers around H2O functions that make it easier to use within tidymodels.
-
+-   We've added som wrappers around H2O functions that make it easier to use within tidymodels.
 
 ## Fit models on the H2O server
 
@@ -260,7 +237,7 @@ lr_fit <- lr_spec %>% fit(Class ~ .,  data = ad_train)
 lr_fit
 ```
 
-## What's different? 
+## What's different?
 
 ```{r}
 #| code-line-numbers: "10,13"
@@ -283,21 +260,16 @@ lr_fit <- lr_spec %>% fit(Class ~ .,  data = ad_train)
 lr_fit
 ```
 
-
 ## Predict on the test set
 
-:::: {.columns}
-
+::: columns
 ::: {.column width="50%"}
-
 ```{r}
 predict(lr_fit, ad_test, type = "prob")
 ```
-
 :::
 
 ::: {.column width="50%"}
-
 ```{r}
 #| out-width: 80%
 #| fig-width: 6
@@ -309,10 +281,8 @@ lr_fit %>%
   extract_fit_engine() %>%
   vip()
 ```
-
 :::
-
-::::
+:::
 
 ## Hyperparameter tuning
 
@@ -337,7 +307,7 @@ set.seed(3)
 lr_res <- lr_wflow %>% tune_grid(resamples = ad_folds, grid = 10)
 ```
 
-## What's different? 
+## What's different?
 
 ```{r}
 #| code-line-numbers: "5"
@@ -362,11 +332,9 @@ set.seed(3)
 lr_res <- lr_wflow %>% tune_grid(resamples = ad_folds, grid = 10)
 ```
 
-
 . . .
 
 Parallel processing is easy to do via R and/or H2O tools. See [this vignette](https://agua.tidymodels.org/dev/articles/parallel.html).
-
 
 ## Use parsnip's new model type `auto_ml()`
 
@@ -400,11 +368,11 @@ autoplot(auto_fit, type = "rank", metric = "roc_auc")
 
 ## Overview
 
-* tidymodels not support clustering models with addition of tidyclust (soon to be on CRAN)
+-   tidymodels not support clustering models with addition of tidyclust (soon to be on CRAN)
 
-* Specify, fit, predict and evaluate clustering models
+-   Specify, fit, predict and evaluate clustering models
 
-* Learning tidyclust should be a breeze if you are already familiar with tidymodels
+-   Learning tidyclust should be a breeze if you are already familiar with tidymodels
 
 ## Specify clustering models
 
@@ -433,7 +401,7 @@ ad_rec <- ad_train %>%
   step_normalize(all_predictors())
 ```
 
-A workflow object binds the pre-processor and the model together for one fitting interface. 
+A workflow object binds the pre-processor and the model together for one fitting interface.
 
 ```{r}
 kmeans_wflow <- workflow(ad_rec, kmeans_spec)
@@ -459,9 +427,7 @@ kmeans_res <- tune_cluster(kmeans_wflow, resamples = ad_folds, grid = grid)
 collect_metrics(kmeans_res)
 ```
 
-
 ## Tuning clustering parameters
-
 
 ```{r}
 #| out-width: '60%'
@@ -471,16 +437,15 @@ collect_metrics(kmeans_res)
 autoplot(kmeans_res, metric = "tot_wss")
 ```
 
-##  Thanks!
+## Thanks!
 
-We want to thank our outside collaborators: Qiushi Yan, Erin LeDell, Tomas Fryda, and Kelly Bodwin. 
+We want to thank our outside collaborators: Qiushi Yan, Erin LeDell, Tomas Fryda, and Kelly Bodwin.
 
 Thanks to the r-lib, tidymodels, and tidyverse teams at ~~Rstudio~~ Posit PBC
 
-These slides are at [`https://github.com/topepo/2022-r-pharma`](https://github.com/topepo/2022-r-pharma).
+These slides are at [`https://topepo.github.io/2022-r-pharma`](https://topepo.github.io/2022-r-pharma).
 
 Learn more about tidymodels at
 
- * [`tmwr.org`](https://www.tmwr.org)
- * [`tidymodels.org`](https://www.tidymodels.org)
-
+-   [`tmwr.org`](https://www.tmwr.org)
+-   [`tidymodels.org`](https://www.tidymodels.org)
