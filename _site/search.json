@@ -1,0 +1,163 @@
+[
+  {
+    "objectID": "index.html#specification-of-survival-models",
+    "href": "index.html#specification-of-survival-models",
+    "title": "Three new things in tidymodels",
+    "section": "Specification of survival models",
+    "text": "Specification of survival models\n\nNew model type proportional_hazards()\nNew mode \"censored regression\"\nNew engines for\n\nParametric models\nSemi-parametric models\nTree-based models\n\nFormula interface for all models, including stratification"
+  },
+  {
+    "objectID": "index.html#make-a-surv-object-at-the-start",
+    "href": "index.html#make-a-surv-object-at-the-start",
+    "title": "Three new things in tidymodels",
+    "section": "Make a Surv() object at the start",
+    "text": "Make a Surv() object at the start\n\nlibrary(tidymodels)\nlibrary(censored)\n\ndata(\"time_to_million\")\n\ntime_to_million <- time_to_million %>%\n  mutate(surv = Surv(time, event), .keep = \"unused\") %>% \n  select(-title, -released)\n\n\nglimpse(time_to_million)\n#> Rows: 551\n#> Columns: 46\n#> $ released_theaters <dbl> 3427, 102, 3018, 349, 2471, 838, 899, 115, 3615, 523, 384, 661, 3589, 158, 3102, 3708, 2139,…\n#> $ distributor       <fct> paramount_pi, sony_pictures, warner_bros, lionsgate, entertainmen, focus_features, samuel_go…\n#> $ year              <dbl> 2016, 2018, 2018, 2017, 2017, 2018, 2015, 2016, 2017, 2016, 2015, 2017, 2018, 2015, 2018, 20…\n#> $ rated             <fct> pg_13, pg, r, pg_13, pg_13, pg_13, pg_13, not_rated, r, r, pg_13, pg, pg_13, pg_13, r, r, r,…\n#> $ runtime           <dbl> 103, 102, 130, 106, 89, 107, 121, 152, 104, 98, 99, 104, 90, 97, 117, 136, 104, 109, 91, 120…\n#> $ action            <dbl> 1, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0,…\n#> $ drama             <dbl> 1, 1, 1, 0, 1, 1, 1, 0, 0, 1, 0, 1, 1, 1, 0, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1,…\n#> $ horror            <dbl> 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0,…\n#> $ mystery           <dbl> 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0,…\n#> $ sci_fi            <dbl> 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0,…\n#> $ thriller          <dbl> 1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 1, 1, 0, 0,…\n#> $ comedy            <dbl> 0, 1, 0, 1, 0, 0, 0, 1, 1, 1, 1, 0, 0, 1, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1,…\n#> $ history           <dbl> 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,…\n#> $ war               <dbl> 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0,…\n#> $ family            <dbl> 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0,…\n#> $ adventure         <dbl> 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0,…\n#> $ romance           <dbl> 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 1,…\n#> $ crime             <dbl> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0,…\n#> $ music             <dbl> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0,…\n#> $ biography         <dbl> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0,…\n#> $ fantasy           <dbl> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0,…\n#> $ musical           <dbl> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0,…\n#> $ animation         <dbl> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,…\n#> $ documentary       <dbl> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,…\n#> $ sport             <dbl> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,…\n#> $ western           <dbl> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,…\n#> $ short             <dbl> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,…\n#> $ english           <dbl> 1, 0, 1, 0, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1,…\n#> $ hindi             <dbl> 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0,…\n#> $ russian           <dbl> 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,…\n#> $ spanish           <dbl> 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,…\n#> $ german            <dbl> 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0,…\n#> $ french            <dbl> 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0,…\n#> $ japanese          <dbl> 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,…\n#> $ italian           <dbl> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0,…\n#> $ mandarin          <dbl> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,…\n#> $ usa               <dbl> 1, 0, 1, 0, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1,…\n#> $ india             <dbl> 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0,…\n#> $ mexico            <dbl> 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,…\n#> $ uk                <dbl> 0, 0, 0, 0, 1, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0,…\n#> $ france            <dbl> 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,…\n#> $ china             <dbl> 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0,…\n#> $ canada            <dbl> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,…\n#> $ japan             <dbl> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,…\n#> $ australia         <dbl> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,…\n#> $ surv              <Surv> <Surv[40 x 2]>"
+  },
+  {
+    "objectID": "index.html#regularized-cox-model",
+    "href": "index.html#regularized-cox-model",
+    "title": "Three new things in tidymodels",
+    "section": "Regularized Cox model",
+    "text": "Regularized Cox model\n\n\n\ncox_spec <- proportional_hazards(penalty = 0.01) %>%\n  set_engine(\"glmnet\")\n\ncox_fit <- \n  cox_spec %>% fit(surv ~ ., data = time_to_million)\n\n\ntidy(cox_fit)\n#> # A tibble: 3,873 × 5\n#>    term               step estimate lambda dev.ratio\n#>    <chr>             <dbl>    <dbl>  <dbl>     <dbl>\n#>  1 released_theaters     2 0.000100  0.747    0.0194\n#>  2 released_theaters     3 0.000193  0.680    0.0358\n#>  3 released_theaters     4 0.000280  0.620    0.0497\n#>  4 released_theaters     5 0.000361  0.565    0.0616\n#>  5 released_theaters     6 0.000437  0.515    0.0718\n#>  6 released_theaters     7 0.000509  0.469    0.0804\n#>  7 released_theaters     8 0.000576  0.427    0.0879\n#>  8 released_theaters     9 0.000639  0.389    0.0942\n#>  9 released_theaters    10 0.000698  0.355    0.0996\n#> 10 released_theaters    11 0.000753  0.323    0.104 \n#> # … with 3,863 more rows\n\n\n\nautoplot(cox_fit, best_penalty = 0.01)"
+  },
+  {
+    "objectID": "index.html#available-in-censored",
+    "href": "index.html#available-in-censored",
+    "title": "Three new things in tidymodels",
+    "section": "Available in censored",
+    "text": "Available in censored\nAll for the mode \"censored regression\".\n\n\n\nmodel\nengine\n\n\n\n\nbag_tree()\nrpart\n\n\nboost_tree()\nmboost\n\n\ndecision_tree()\nrpart\n\n\ndecision_tree()\npartykit\n\n\nproportional_hazards()\nsurvival\n\n\nproportional_hazards()\nglmnet\n\n\nrand_forest()\npartykit\n\n\nsurvival_reg()\nsurvival\n\n\nsurvival_reg()\nflexsurv"
+  },
+  {
+    "objectID": "index.html#prediction-with-survival-models",
+    "href": "index.html#prediction-with-survival-models",
+    "title": "Three new things in tidymodels",
+    "section": "Prediction with survival models",
+    "text": "Prediction with survival models\n\nFor all models:\n\nSurvival time via type = \"time\"\nSurvival probability via type = \"survival\"\n\nDepending on the engine: types \"hazard\", \"quantile\", and \"linear_pred\"\n\n\nAll adhere to the tidymodels prediction guarantee:\n\nThe predictions are always inside a tibble.\nThe column names and types are unsurprising and predictable.\nThe number of rows in new_data and the output are the same."
+  },
+  {
+    "objectID": "index.html#predict-survival-time",
+    "href": "index.html#predict-survival-time",
+    "title": "Three new things in tidymodels",
+    "section": "Predict survival time",
+    "text": "Predict survival time\n\n# Pull out some specific movies:\nselected_rows <- c(40, 372, 126)\n\n# Evaluate them at these weeks:\nat_weeks <- seq(1, 50, by = 1 / 2)\n\npredict(cox_fit, time_to_million[selected_rows, ], type = \"time\")\n#> # A tibble: 3 × 1\n#>   .pred_time\n#>        <dbl>\n#> 1     0.0534\n#> 2   110.    \n#> 3    28.9"
+  },
+  {
+    "objectID": "index.html#predict-survival-probability",
+    "href": "index.html#predict-survival-probability",
+    "title": "Three new things in tidymodels",
+    "section": "Predict survival probability",
+    "text": "Predict survival probability\n\n\npred <- predict(cox_fit, time_to_million[selected_rows, ], type = \"survival\", time = at_weeks)\npred\n#> # A tibble: 3 × 1\n#>   .pred            \n#>   <list>           \n#> 1 <tibble [99 × 2]>\n#> 2 <tibble [99 × 2]>\n#> 3 <tibble [99 × 2]>\n\n\npred$.pred[[1]]\n#> # A tibble: 99 × 2\n#>    .time .pred_survival\n#>    <dbl>          <dbl>\n#>  1   1        1.07e- 59\n#>  2   1.5      8.73e-101\n#>  3   2        7.69e-175\n#>  4   2.5      3.81e-220\n#>  5   3        3.32e-272\n#>  6   3.5      1.37e-317\n#>  7   4        0        \n#>  8   4.5      0        \n#>  9   5        0        \n#> 10   5.5      0        \n#> # … with 89 more rows"
+  },
+  {
+    "objectID": "index.html#approximation-the-survival-curve",
+    "href": "index.html#approximation-the-survival-curve",
+    "title": "Three new things in tidymodels",
+    "section": "Approximation the survival curve",
+    "text": "Approximation the survival curve\n\n\n\npred %>%\n  mutate(id = factor(selected_rows)) %>%\n  tidyr::unnest(cols = .pred)\n#> # A tibble: 297 × 3\n#>    .time .pred_survival id   \n#>    <dbl>          <dbl> <fct>\n#>  1   1        1.07e- 59 40   \n#>  2   1.5      8.73e-101 40   \n#>  3   2        7.69e-175 40   \n#>  4   2.5      3.81e-220 40   \n#>  5   3        3.32e-272 40   \n#>  6   3.5      1.37e-317 40   \n#>  7   4        0         40   \n#>  8   4.5      0         40   \n#>  9   5        0         40   \n#> 10   5.5      0         40   \n#> # … with 287 more rows"
+  },
+  {
+    "objectID": "index.html#approximation-the-survival-curve-1",
+    "href": "index.html#approximation-the-survival-curve-1",
+    "title": "Three new things in tidymodels",
+    "section": "Approximation the survival curve",
+    "text": "Approximation the survival curve\n\n\n\npred %>%\n  mutate(id = factor(selected_rows)) %>%\n  tidyr::unnest(cols = .pred) %>%\n  ggplot(\n    aes(x = .time, y = .pred_survival,\n        col = id)\n  ) +\n  geom_step() +\n  labs(x = \"Time\", y = \"Pr[survival]\") +\n  scale_y_continuous(limits = c(0,1)) +\n  theme(legend.position = \"top\")\n\n\n\n\n\n\n\n\n\nUnblinded IDs\n\n40: Ant Man\n126: Elvis & Nixon\n372: Sorry to Bother You"
+  },
+  {
+    "objectID": "index.html#whats-next",
+    "href": "index.html#whats-next",
+    "title": "Three new things in tidymodels",
+    "section": "What’s next?",
+    "text": "What’s next?\nSo far, we’ve done a lot with individual models.\nWe have more to add:\n\nPerformance metrics\n\ntime-dependent ROC curves\nBrier scores (time-dependent and integrated)\nand so on.\n\nTighter tidymodels integration for model tuning and resampling"
+  },
+  {
+    "objectID": "index.html#changes",
+    "href": "index.html#changes",
+    "title": "Three new things in tidymodels",
+    "section": "Changes",
+    "text": "Changes\n\nnew parsnip 'h2o' engine for many models.\n\nSee here for a complete list.\n\nThe interactions between H2O and tidymodels are minimized so that there are few expensive data transfer penalties.\nWe’ve added som wrappers around H2O functions that make it easier to use within tidymodels."
+  },
+  {
+    "objectID": "index.html#fit-models-on-the-h2o-server",
+    "href": "index.html#fit-models-on-the-h2o-server",
+    "title": "Three new things in tidymodels",
+    "section": "Fit models on the H2O server",
+    "text": "Fit models on the H2O server\n\nlibrary(agua)\ndata(ad_data)\n\nset.seed(1)\nad_split <- initial_split(ad_data, strata = Class)\nad_train <- training(ad_split)\nad_test  <- testing(ad_split)\n\n# start h2o server\nh2o_start()\n\nlr_spec <- logistic_reg() %>%\n  set_engine(\"h2o\")\n\nlr_fit <- lr_spec %>% fit(Class ~ .,  data = ad_train)\n\n\nlr_fit\n#> parsnip model object\n#> \n#> Model Details:\n#> ==============\n#> \n#> H2OBinomialModel: glm\n#> Model ID:  GLM_model_R_1667314396292_35969 \n#> GLM Model: summary\n#>     family  link                               regularization number_of_predictors_total number_of_active_predictors\n#> 1 binomial logit Elastic Net (alpha = 0.5, lambda = 0.03768 )                        134                          35\n#>   number_of_iterations    training_frame\n#> 1                    6 object_oqorahuxjg\n#> \n#> Coefficients: glm coefficients\n#>                             names coefficients standardized_coefficients\n#> 1                       Intercept   -28.586754                 -1.433734\n#> 2  ACE_CD143_Angiotensin_Converti     0.000000                  0.000000\n#> 3 ACTH_Adrenocorticotropic_Hormon     0.153691                  0.040988\n#> 4                             AXL     0.000000                  0.000000\n#> 5                     Adiponectin     0.000000                  0.000000\n#> \n#> ---\n#>            names coefficients standardized_coefficients\n#> 130         male     0.000000                  0.000000\n#> 131 GenotypeE2E3     0.000000                  0.000000\n#> 132 GenotypeE2E4     0.000000                  0.000000\n#> 133 GenotypeE3E3     0.000000                  0.000000\n#> 134 GenotypeE3E4     0.000000                  0.000000\n#> 135 GenotypeE4E4     0.353067                  0.072697\n#> \n#> H2OBinomialMetrics: glm\n#> ** Reported on training data. **\n#> \n#> MSE:  0.07387355\n#> RMSE:  0.2717969\n#> LogLoss:  0.2661139\n#> Mean Per-Class Error:  0.1094004\n#> AUC:  0.9583198\n#> AUCPR:  0.9279918\n#> Gini:  0.9166396\n#> R^2:  0.6278653\n#> Residual Deviance:  132.5247\n#> AIC:  204.5247\n#> \n#> Confusion Matrix (vertical: actual; across: predicted) for F1-optimal threshold:\n#>          Control Impaired    Error     Rate\n#> Control      176        5 0.027624   =5/181\n#> Impaired      13       55 0.191176   =13/68\n#> Totals       189       60 0.072289  =18/249\n#> \n#> Maximum Metrics: Maximum metrics at their respective thresholds\n#>                         metric threshold      value idx\n#> 1                       max f1  0.431653   0.859375  59\n#> 2                       max f2  0.286331   0.859155  82\n#> 3                 max f0point5  0.515650   0.910714  52\n#> 4                 max accuracy  0.431653   0.927711  59\n#> 5                max precision  0.901022   1.000000   0\n#> 6                   max recall  0.094922   1.000000 159\n#> 7              max specificity  0.901022   1.000000   0\n#> 8             max absolute_mcc  0.431653   0.813859  59\n#> 9   max min_per_class_accuracy  0.319595   0.882353  79\n#> 10 max mean_per_class_accuracy  0.349492   0.893321  69\n#> 11                     max tns  0.901022 181.000000   0\n#> 12                     max fns  0.901022  67.000000   0\n#> 13                     max fps  0.011287 181.000000 248\n#> 14                     max tps  0.094922  68.000000 159\n#> 15                     max tnr  0.901022   1.000000   0\n#> 16                     max fnr  0.901022   0.985294   0\n#> 17                     max fpr  0.011287   1.000000 248\n#> 18                     max tpr  0.094922   1.000000 159\n#> \n#> Gains/Lift Table: Extract with `h2o.gainsLift(<model>, <data>)` or `h2o.gainsLift(<model>, valid=<T/F>, xval=<T/F>)`"
+  },
+  {
+    "objectID": "index.html#whats-different",
+    "href": "index.html#whats-different",
+    "title": "Three new things in tidymodels",
+    "section": "What’s different?",
+    "text": "What’s different?\n\nlibrary(agua)\ndata(ad_data)\n\nset.seed(1)\nad_split <- initial_split(ad_data, strata = Class)\nad_train <- training(ad_split)\nad_test  <- testing(ad_split)\n\n# start h2o server\nh2o_start()\n\nlr_spec <- logistic_reg() %>%\n  set_engine(\"h2o\")\n\nlr_fit <- lr_spec %>% fit(Class ~ .,  data = ad_train)\nlr_fit"
+  },
+  {
+    "objectID": "index.html#predict-on-the-test-set",
+    "href": "index.html#predict-on-the-test-set",
+    "title": "Three new things in tidymodels",
+    "section": "Predict on the test set",
+    "text": "Predict on the test set\n\n\n\npredict(lr_fit, ad_test, type = \"prob\")\n#> # A tibble: 84 × 2\n#>    .pred_Control .pred_Impaired\n#>            <dbl>          <dbl>\n#>  1        0.932          0.0675\n#>  2        0.821          0.179 \n#>  3        0.973          0.0267\n#>  4        0.941          0.0588\n#>  5        0.383          0.617 \n#>  6        0.836          0.164 \n#>  7        0.0753         0.925 \n#>  8        0.446          0.554 \n#>  9        0.614          0.386 \n#> 10        0.926          0.0744\n#> # … with 74 more rows\n\n\n\nlibrary(vip)\n\n# We can also use the native H2O object: \nlr_fit %>%\n  extract_fit_engine() %>%\n  vip()"
+  },
+  {
+    "objectID": "index.html#hyperparameter-tuning",
+    "href": "index.html#hyperparameter-tuning",
+    "title": "Three new things in tidymodels",
+    "section": "Hyperparameter tuning",
+    "text": "Hyperparameter tuning\n\nset.seed(2)\nad_folds <- vfold_cv(ad_train, v = 10, strata = Class)\n\nlr_spec <- logistic_reg(penalty = tune()) %>%\n  set_engine(\"h2o\")\n\nad_rec <- recipe(Class ~ ., data = ad_train) %>%\n  step_YeoJohnson(all_numeric_predictors()) %>% \n  step_dummy(all_nominal_predictors()) %>% \n  step_zv(all_predictors()) %>% \n  step_normalize(all_predictors())\n\nlr_wflow <- workflow() %>%\n  add_model(lr_spec) %>%\n  add_recipe(ad_rec)\n\nset.seed(3)\nlr_res <- lr_wflow %>% tune_grid(resamples = ad_folds, grid = 10)"
+  },
+  {
+    "objectID": "index.html#whats-different-1",
+    "href": "index.html#whats-different-1",
+    "title": "Three new things in tidymodels",
+    "section": "What’s different?",
+    "text": "What’s different?\n\nset.seed(2)\nad_folds <- vfold_cv(ad_train, v = 10, strata = Class)\n\nlr_spec <- logistic_reg(penalty = tune()) %>%\n  set_engine(\"h2o\")\n\nad_rec <- recipe(Class ~ ., data = ad_train) %>%\n  step_YeoJohnson(all_numeric_predictors()) %>% \n  step_dummy(all_nominal_predictors()) %>% \n  step_zv(all_predictors()) %>% \n  step_normalize(all_predictors())\n\nlr_wflow <- workflow() %>%\n  add_model(lr_spec) %>%\n  add_recipe(ad_rec)\n\nset.seed(3)\nlr_res <- lr_wflow %>% tune_grid(resamples = ad_folds, grid = 10)\n\n\nParallel processing is easy to do via R and/or H2O tools. See this vignette."
+  },
+  {
+    "objectID": "index.html#use-parsnips-new-model-type-auto_ml",
+    "href": "index.html#use-parsnips-new-model-type-auto_ml",
+    "title": "Three new things in tidymodels",
+    "section": "Use parsnip’s new model type auto_ml()",
+    "text": "Use parsnip’s new model type auto_ml()\n\nauto_mod <- auto_ml() %>%\n  set_engine(\"h2o\", max_runtime_secs = 300) %>%\n  set_mode(\"classification\")\n\nauto_fit <- auto_mod %>% fit(Class ~ ., data = ad_train)\n\nSummarize model performances with get_leaderboard()\n\nauto_fit %>%\n  get_leaderboard() %>% \n  slice(1:5)\n#> # A tibble: 5 × 7\n#>   model_id                                                  auc logloss aucpr mean_per_class_error  rmse   mse\n#>   <chr>                                                   <dbl>   <dbl> <dbl>                <dbl> <dbl> <dbl>\n#> 1 StackedEnsemble_BestOfFamily_4_AutoML_5_20221101_160842 0.894   0.343 0.820                0.184 0.321 0.103\n#> 2 DeepLearning_grid_1_AutoML_5_20221101_160842_model_26   0.884   1.13  0.807                0.182 0.374 0.140\n#> 3 StackedEnsemble_BestOfFamily_6_AutoML_5_20221101_160842 0.883   0.355 0.819                0.177 0.323 0.104\n#> 4 GBM_grid_1_AutoML_5_20221101_160842_model_9             0.882   0.389 0.759                0.180 0.352 0.124\n#> 5 GBM_grid_1_AutoML_5_20221101_160842_model_21            0.880   0.376 0.772                0.177 0.340 0.116\n\nHelper functions for visualizing member models, etc\n\nautoplot(auto_fit, type = \"rank\", metric = \"roc_auc\")"
+  },
+  {
+    "objectID": "index.html#overview",
+    "href": "index.html#overview",
+    "title": "Three new things in tidymodels",
+    "section": "Overview",
+    "text": "Overview\n\ntidymodels not support clustering models with addition of tidyclust (soon to be on CRAN)\nSpecify, fit, predict and evaluate clustering models\nLearning tidyclust should be a breeze if you are already familiar with tidymodels"
+  },
+  {
+    "objectID": "index.html#specify-clustering-models",
+    "href": "index.html#specify-clustering-models",
+    "title": "Three new things in tidymodels",
+    "section": "Specify clustering models",
+    "text": "Specify clustering models\n\n# remotes::install_github(\"EmilHvitfeldt/tidyclust\")\nlibrary(tidyclust)\n\nkmeans_spec <- k_means(num_clusters = 4) %>%\n  set_engine(\"stats\") %>%\n  set_mode(\"partition\")\nkmeans_spec\n#> K Means Cluster Specification (partition)\n#> \n#> Main Arguments:\n#>   num_clusters = 4\n#> \n#> Computational engine: stats"
+  },
+  {
+    "objectID": "index.html#fitting-clustering-models",
+    "href": "index.html#fitting-clustering-models",
+    "title": "Three new things in tidymodels",
+    "section": "Fitting clustering models",
+    "text": "Fitting clustering models\nNotice how tidyclust works fluently with recipes and workflow (notice how we didn’t set an outcome in the recipe)\n\n# Make an unsupervised recipe with just the assay data\nad_rec <- ad_train %>% \n  select(-Class, -Genotype, -male) %>% \n  recipe(formula = ~ .) %>%\n  step_YeoJohnson(all_numeric_predictors()) %>% \n  step_dummy(all_nominal_predictors()) %>% \n  step_zv(all_predictors()) %>% \n  step_normalize(all_predictors())\n\nA workflow object binds the pre-processor and the model together for one fitting interface.\n\nkmeans_wflow <- workflow(ad_rec, kmeans_spec)\nkmeans_fit <- fit(kmeans_wflow, data = ad_train)\nkmeans_fit\n#> ══ Workflow [trained] ══════════════════════════════════════════════════════════════════════════════════════════════════\n#> Preprocessor: Recipe\n#> Model: k_means()\n#> \n#> ── Preprocessor ────────────────────────────────────────────────────────────────────────────────────────────────────────\n#> 4 Recipe Steps\n#> \n#> • step_YeoJohnson()\n#> • step_dummy()\n#> • step_zv()\n#> • step_normalize()\n#> \n#> ── Model ───────────────────────────────────────────────────────────────────────────────────────────────────────────────\n#> K-means clustering with 4 clusters of sizes 69, 66, 68, 46\n#> \n#> Cluster means:\n#>   ACE_CD143_Angiotensin_Converti ACTH_Adrenocorticotropic_Hormon        AXL Adiponectin Alpha_1_Antichymotrypsin\n#> 1                      0.6836882                       0.1528054  0.6497034  -0.1241515               -0.1174433\n#> 2                     -0.5493031                      -0.3274418 -0.5512176   0.4283056                0.4878523\n#> 3                     -0.6224848                      -0.0762455 -0.6941297  -0.6646911               -0.9951585\n#> 4                      0.6827932                       0.3533104  0.8424271   0.5542887                0.9473068\n#>   Alpha_1_Antitrypsin Alpha_1_Microglobulin Alpha_2_Macroglobulin Angiopoietin_2_ANG_2 Angiotensinogen\n#> 1          -0.2848140            -0.3098983             0.1847187            0.4919176      0.09626379\n#> 2           0.5213351             0.5620315             0.1030472           -0.3798560     -0.35010590\n#> 3          -0.6641991            -0.9399764            -0.9028277           -0.7969235      0.02288645\n#> 4           0.6610779             1.0479847             0.9096863            0.9851953      0.32409803\n#>   Apolipoprotein_A_IV Apolipoprotein_A1 Apolipoprotein_A2 Apolipoprotein_B Apolipoprotein_CI Apolipoprotein_CIII\n#> 1          -0.3740499        -0.2580867        -0.4134386       -0.3347926        -0.2237942          -0.3815270\n#> 2           0.7292428         0.6861236         0.7999672        0.6669666         0.6421302           0.6637349\n#> 3          -0.7272732        -0.8551889        -0.8282364       -0.6583244        -0.8100441          -0.6887179\n#> 4           0.5898694         0.6668842         0.6967284        0.5184121         0.6118307           0.6380799\n#>   Apolipoprotein_D Apolipoprotein_E Apolipoprotein_H B_Lymphocyte_Chemoattractant_BL      BMP_6 Beta_2_Microglobulin\n#> 1       -0.2172552        0.4510260       -0.5020307                     -0.04017782 -0.0536867            0.4860300\n#> 2        0.3500162       -0.3286519        0.6368637                      0.31717109 -0.1234632           -0.2635367\n#> 3       -0.7457368       -0.7601465       -0.6213225                     -0.76400837  0.3122190           -0.9266446\n#> 4        0.9260791        0.9186999        0.7577616                      0.73459884 -0.2038683            1.0188953\n#>   Betacellulin C_Reactive_Protein       CD40       CD5L  Calbindin  Calcitonin        CgA Clusterin_Apo_J Complement_3\n#> 1 -0.003903972         -0.1518390  0.4049581 -0.4009738  0.4833949  0.18152964  0.6615849       0.3944845  -0.07213652\n#> 2 -0.029453872          0.2118493 -0.2744039  0.4737180 -0.4407043  0.09218262 -0.6694636      -0.2018028   0.44782518\n#> 3  0.267720151         -0.2942125 -0.7071246 -0.5831438 -0.4646311 -0.22569856 -0.4033751      -0.9562452  -0.97700689\n#> 4 -0.347644361          0.3587236  0.8315875  0.7838171  0.5940685 -0.07091513  0.5644510       1.1113963   0.90994404\n#>   Complement_Factor_H Connective_Tissue_Growth_Factor    Cortisol Creatine_Kinase_MB Cystatin_C      EGF_R    EN_RAGE\n#> 1          -0.3425673                      -0.3963910  0.08981845         -0.1850983  0.6362843  0.5439616 -0.2025079\n#> 2           0.3084882                       0.4891289  0.10248532          0.1608744 -0.4406589 -0.4002516  0.2100168\n#> 3          -0.4311773                       0.2397263 -0.31233202          0.2024333 -0.7334024 -0.7162191 -0.1177400\n#> 4           0.7086300                      -0.4615853  0.17993637         -0.2524216  0.7619833  0.8170904  0.1764840\n#>        ENA_78   Eotaxin_3        FAS FSH_Follicle_Stimulation_Hormon   Fas_Ligand Fatty_Acid_Binding_Protein   Ferritin\n#> 1 -0.03638214  0.17869977  0.2957729                    -0.007069386 -0.005420406                  0.5204176  0.3502047\n#> 2  0.16887322 -0.04227573 -0.1235480                    -0.310849036 -0.092441566                 -0.3099420 -0.1565868\n#> 3 -0.39149165 -0.77133156 -0.8582362                     0.011277465 -0.219933758                 -0.8841779 -0.7244796\n#> 4  0.39100364  0.93283609  1.0023020                     0.439933835  0.465883628                  0.9711186  0.7703309\n#>     Fetuin_A Fibrinogen    GRO_alpha Gamma_Interferon_induced_Monokin Glutathione_S_Transferase_alpha     HB_EGF\n#> 1 -0.3919251 -0.3172756 -0.009909929                       -0.2097486                    -0.409480889  0.3261901\n#> 2  0.7259104  0.5035059  0.056906133                        0.3075442                     0.466919295 -0.2177115\n#> 3 -0.8853076 -0.6686406 -0.476696566                       -0.7073394                     0.006149705 -0.4633678\n#> 4  0.8550796  0.7419172  0.637898843                        0.9189960                    -0.064797218  0.5080620\n#>        HCC_4 Hepatocyte_Growth_Factor_HGF      I_309       ICAM_1     IGF_BP_2       IL_11       IL_13      IL_16\n#> 1 -0.2752478                    0.4406145  0.4307925  0.068911718  0.140764658  0.08105526  0.02187974  0.1166058\n#> 2  0.3365999                   -0.2745098 -0.2344247  0.001539618 -0.009467071 -0.23963765  0.11235664  0.1417507\n#> 3 -0.5855593                   -0.8389536 -0.7610287 -0.757107051 -0.854498920  0.16160408 -0.45166305 -0.9542671\n#> 4  0.7955334                    0.9731324  0.8151586  1.013625133  1.065608520 -0.01664793  0.47364884  1.0323655\n#>         IL_17E  IL_1alpha         IL_3        IL_4       IL_5       IL_6 IL_6_Receptor       IL_7        IL_8\n#> 1  0.177293327 -0.1571770 -0.005319973 -0.01412368  0.2655407 -0.2339475     0.4415787 -0.1362562 -0.06166829\n#> \n#> ...\n#> and 59 more lines."
+  },
+  {
+    "objectID": "index.html#tuning-clustering-parameters",
+    "href": "index.html#tuning-clustering-parameters",
+    "title": "Three new things in tidymodels",
+    "section": "Tuning clustering parameters",
+    "text": "Tuning clustering parameters\nTrying multiple hyper parameter values can be done with tune_cluster() which has a similar interface as tune_grid()\n\nkmeans_wflow <- kmeans_wflow %>%\n  update_model(kmeans_spec %>% set_args(num_clusters = tune()))\n\ngrid <- tibble(num_clusters = 1:20)\n\nkmeans_res <- tune_cluster(kmeans_wflow, resamples = ad_folds, grid = grid)\n\n\ncollect_metrics(kmeans_res)\n#> # A tibble: 40 × 7\n#>    num_clusters .metric .estimator   mean     n std_err .config              \n#>           <int> <chr>   <chr>       <dbl> <int>   <dbl> <chr>                \n#>  1            1 tot_sse standard   28557.    10    23.0 Preprocessor1_Model01\n#>  2            1 tot_wss standard   28557.    10    23.0 Preprocessor1_Model01\n#>  3            2 tot_sse standard   28557.    10    23.0 Preprocessor1_Model02\n#>  4            2 tot_wss standard   23465.    10    52.0 Preprocessor1_Model02\n#>  5            3 tot_sse standard   28557.    10    23.0 Preprocessor1_Model03\n#>  6            3 tot_wss standard   21884.    10    45.6 Preprocessor1_Model03\n#>  7            4 tot_sse standard   28557.    10    23.0 Preprocessor1_Model04\n#>  8            4 tot_wss standard   20657.    10    52.8 Preprocessor1_Model04\n#>  9            5 tot_sse standard   28557.    10    23.0 Preprocessor1_Model05\n#> 10            5 tot_wss standard   20037.    10    47.7 Preprocessor1_Model05\n#> # … with 30 more rows"
+  },
+  {
+    "objectID": "index.html#tuning-clustering-parameters-1",
+    "href": "index.html#tuning-clustering-parameters-1",
+    "title": "Three new things in tidymodels",
+    "section": "Tuning clustering parameters",
+    "text": "Tuning clustering parameters\n\nautoplot(kmeans_res, metric = \"tot_wss\")"
+  },
+  {
+    "objectID": "index.html#thanks",
+    "href": "index.html#thanks",
+    "title": "Three new things in tidymodels",
+    "section": "Thanks!",
+    "text": "Thanks!\nWe want to thank our outside collaborators: Qiushi Yan, Erin LeDell, Tomas Fryda, and Kelly Bodwin.\nThanks to the r-lib, tidymodels, and tidyverse teams at Rstudio Posit PBC\nThese slides are at https://github.com/topepo/2022-r-pharma.\nLearn more about tidymodels at\n\ntmwr.org\ntidymodels.org\n\n\n\nhttps://www.tidymodels.org"
+  }
+]

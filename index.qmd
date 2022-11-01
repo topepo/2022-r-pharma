@@ -1,0 +1,486 @@
+---
+title: "Three new things in tidymodels"
+author: "Max Kuhn (Posit PBC)<br>Hannah Frick (Posit PBC)<br>Emil Hvitfeldt (Posit PBC)<br>Qiushi Yan (Vanderbilt University)"
+format:
+  revealjs: 
+    theme: [default, style.scss]
+    width: 1600
+    height: 900
+    footer: <https://www.tidymodels.org>
+knitr:
+  opts_chunk: 
+    dev: svg
+    dev-args: list(bg = "transparent")
+    echo: true
+    collapse: true
+    comment: "#>"
+---
+
+# Censored regression in tidymodels
+
+## Specification of survival models
+
+-   New model type `proportional_hazards()`
+-   New mode `"censored regression"`
+-   New engines for 
+    - Parametric models
+    - Semi-parametric models
+    - Tree-based models
+-   Formula interface for all models, including stratification
+
+## Make a `Surv()` object at the start
+
+```{r}
+#| include: false
+
+library(tidymodels)
+library(censored)
+library(agua)
+library(tidyclust)
+library(doMC)
+
+registerDoMC(cores = 10)
+theme_set(theme_bw())
+options(width = 120)
+```
+
+```{r}
+library(tidymodels)
+library(censored)
+
+data("time_to_million")
+
+time_to_million <- time_to_million %>%
+  mutate(surv = Surv(time, event), .keep = "unused") %>% 
+  select(-title, -released)
+```
+
+```{r}
+glimpse(time_to_million)
+```
+
+## Regularized Cox model
+
+:::: {.columns}
+
+::: {.column width="50%"}
+
+```{r}
+cox_spec <- proportional_hazards(penalty = 0.01) %>%
+  set_engine("glmnet")
+
+cox_fit <- 
+  cox_spec %>% fit(surv ~ ., data = time_to_million)
+```
+
+```{r}
+tidy(cox_fit)
+```
+
+:::
+
+::: {.column width="50%"}
+
+
+```{r}
+#| fig-width: 6
+#| fig-height: 4.25
+#| fig-align: center
+#| out-width: 100%
+autoplot(cox_fit, best_penalty = 0.01)
+```
+
+:::
+
+:::: 
+
+## Available in censored 
+
+All for the mode `"censored regression"`.
+
+| model                    | engine   |
+|:-------------------------|:---------|
+| `bag_tree()`             | rpart    |
+| `boost_tree()`           | mboost   |
+| `decision_tree()`        | rpart    |
+| `decision_tree()`        | partykit |
+| `proportional_hazards()` | survival |
+| `proportional_hazards()` | glmnet   |
+| `rand_forest()`          | partykit |
+| `survival_reg()`         | survival |
+| `survival_reg()`         | flexsurv |
+
+## Prediction with survival models
+
+- For all models:
+  - Survival time via `type = "time"`
+  - Survival probability via `type = "survival"`
+- Depending on the engine: types `"hazard"`, `"quantile"`, and `"linear_pred"`
+
+. . .
+
+All adhere to the **tidymodels prediction guarantee**:
+
+-   The predictions are always inside a **tibble**.
+-   The column names and types are **unsurprising** and **predictable**.
+-   The number of rows in `new_data` and the output **are the same**.
+
+## Predict survival time
+
+```{r}
+# Pull out some specific movies:
+selected_rows <- c(40, 372, 126)
+
+# Evaluate them at these weeks:
+at_weeks <- seq(1, 50, by = 1 / 2)
+
+predict(cox_fit, time_to_million[selected_rows, ], type = "time")
+```
+
+
+## Predict survival probability
+
+```{r}
+
+pred <- predict(cox_fit, time_to_million[selected_rows, ], type = "survival", time = at_weeks)
+pred
+```
+
+```{r}
+pred$.pred[[1]]
+```
+
+## Approximation the survival curve
+
+
+:::: {.columns}
+
+::: {.column width="50%"}
+
+```{r}
+pred %>%
+  mutate(id = factor(selected_rows)) %>%
+  tidyr::unnest(cols = .pred)
+```
+
+:::
+
+::::
+
+## Approximation the survival curve
+
+
+:::: {.columns}
+
+::: {.column width="50%"}
+
+```{r}
+#| out-width: '100%'
+#| fig-width: 5.4
+#| fig-height: 3.6
+#| fig-align: 'center'
+#| dev: 'svg'
+#| dev-args: list(bg = "transparent")
+#| code-line-numbers: "4-11"
+pred %>%
+  mutate(id = factor(selected_rows)) %>%
+  tidyr::unnest(cols = .pred) %>%
+  ggplot(
+    aes(x = .time, y = .pred_survival,
+        col = id)
+  ) +
+  geom_step() +
+  labs(x = "Time", y = "Pr[survival]") +
+  scale_y_continuous(limits = c(0,1)) +
+  theme(legend.position = "top")
+```
+
+:::
+
+::: {.column width="50%"}
+
+Unblinded IDs
+
+* 40: _Ant Man_
+* 126: _Elvis & Nixon_
+* 372: _Sorry to Bother You_
+
+:::
+
+::::
+
+## What's next?
+
+So far, we've done a lot with individual models. 
+
+We have more to add:
+
+* Performance metrics 
+   - time-dependent ROC curves
+   - Brier scores (time-dependent and integrated)
+   - and so on.
+   
+* Tighter tidymodels integration for model tuning and resampling
+
+
+# H20 Integration
+
+## Changes 
+
+* new parsnip `'h2o'` engine for many models. 
+
+  - See [here](https://agua.tidymodels.org/articles/agua.html) for a complete list.
+
+* The interactions between H2O and tidymodels are minimized so that there are few expensive data transfer penalties. 
+
+* We've added som wrappers around H2O functions that make it easier to use within tidymodels.
+
+
+## Fit models on the H2O server
+
+```{r}
+library(agua)
+data(ad_data)
+
+set.seed(1)
+ad_split <- initial_split(ad_data, strata = Class)
+ad_train <- training(ad_split)
+ad_test  <- testing(ad_split)
+
+# start h2o server
+h2o_start()
+
+lr_spec <- logistic_reg() %>%
+  set_engine("h2o")
+
+lr_fit <- lr_spec %>% fit(Class ~ .,  data = ad_train)
+```
+
+```{r}
+lr_fit
+```
+
+## What's different? 
+
+```{r}
+#| code-line-numbers: "10,13"
+#| eval: false
+library(agua)
+data(ad_data)
+
+set.seed(1)
+ad_split <- initial_split(ad_data, strata = Class)
+ad_train <- training(ad_split)
+ad_test  <- testing(ad_split)
+
+# start h2o server
+h2o_start()
+
+lr_spec <- logistic_reg() %>%
+  set_engine("h2o")
+
+lr_fit <- lr_spec %>% fit(Class ~ .,  data = ad_train)
+lr_fit
+```
+
+
+## Predict on the test set
+
+:::: {.columns}
+
+::: {.column width="50%"}
+
+```{r}
+predict(lr_fit, ad_test, type = "prob")
+```
+
+:::
+
+::: {.column width="50%"}
+
+```{r}
+#| out-width: 80%
+#| fig-width: 6
+#| fig-height: 6
+library(vip)
+
+# We can also use the native H2O object: 
+lr_fit %>%
+  extract_fit_engine() %>%
+  vip()
+```
+
+:::
+
+::::
+
+## Hyperparameter tuning
+
+```{r}
+set.seed(2)
+ad_folds <- vfold_cv(ad_train, v = 10, strata = Class)
+
+lr_spec <- logistic_reg(penalty = tune()) %>%
+  set_engine("h2o")
+
+ad_rec <- recipe(Class ~ ., data = ad_train) %>%
+  step_YeoJohnson(all_numeric_predictors()) %>% 
+  step_dummy(all_nominal_predictors()) %>% 
+  step_zv(all_predictors()) %>% 
+  step_normalize(all_predictors())
+
+lr_wflow <- workflow() %>%
+  add_model(lr_spec) %>%
+  add_recipe(ad_rec)
+
+set.seed(3)
+lr_res <- lr_wflow %>% tune_grid(resamples = ad_folds, grid = 10)
+```
+
+## What's different? 
+
+```{r}
+#| code-line-numbers: "5"
+#| eval: false
+set.seed(2)
+ad_folds <- vfold_cv(ad_train, v = 10, strata = Class)
+
+lr_spec <- logistic_reg(penalty = tune()) %>%
+  set_engine("h2o")
+
+ad_rec <- recipe(Class ~ ., data = ad_train) %>%
+  step_YeoJohnson(all_numeric_predictors()) %>% 
+  step_dummy(all_nominal_predictors()) %>% 
+  step_zv(all_predictors()) %>% 
+  step_normalize(all_predictors())
+
+lr_wflow <- workflow() %>%
+  add_model(lr_spec) %>%
+  add_recipe(ad_rec)
+
+set.seed(3)
+lr_res <- lr_wflow %>% tune_grid(resamples = ad_folds, grid = 10)
+```
+
+
+. . .
+
+Parallel processing is easy to do via R and/or H2O tools. See [this vignette](https://agua.tidymodels.org/dev/articles/parallel.html).
+
+
+## Use parsnip's new model type `auto_ml()`
+
+```{r}
+#| label: agua-auto-ml
+#| cache: true
+#| 
+auto_mod <- auto_ml() %>%
+  set_engine("h2o", max_runtime_secs = 300) %>%
+  set_mode("classification")
+
+auto_fit <- auto_mod %>% fit(Class ~ ., data = ad_train)
+```
+
+Summarize model performances with `get_leaderboard()`
+
+```{r}
+auto_fit %>%
+  get_leaderboard() %>% 
+  slice(1:5)
+```
+
+Helper functions for visualizing member models, etc
+
+```{r}
+#| eval: false
+autoplot(auto_fit, type = "rank", metric = "roc_auc")
+```
+
+# Tidy Clustering
+
+## Overview
+
+* tidymodels not support clustering models with addition of tidyclust (soon to be on CRAN)
+
+* Specify, fit, predict and evaluate clustering models
+
+* Learning tidyclust should be a breeze if you are already familiar with tidymodels
+
+## Specify clustering models
+
+```{r}
+# remotes::install_github("EmilHvitfeldt/tidyclust")
+library(tidyclust)
+
+kmeans_spec <- k_means(num_clusters = 4) %>%
+  set_engine("stats") %>%
+  set_mode("partition")
+kmeans_spec
+```
+
+## Fitting clustering models
+
+Notice how tidyclust works fluently with recipes and workflow (notice how we didn't set an outcome in the recipe)
+
+```{r}
+# Make an unsupervised recipe with just the assay data
+ad_rec <- ad_train %>% 
+  select(-Class, -Genotype, -male) %>% 
+  recipe(formula = ~ .) %>%
+  step_YeoJohnson(all_numeric_predictors()) %>% 
+  step_dummy(all_nominal_predictors()) %>% 
+  step_zv(all_predictors()) %>% 
+  step_normalize(all_predictors())
+```
+
+A workflow object binds the pre-processor and the model together for one fitting interface. 
+
+```{r}
+kmeans_wflow <- workflow(ad_rec, kmeans_spec)
+kmeans_fit <- fit(kmeans_wflow, data = ad_train)
+kmeans_fit
+```
+
+## Tuning clustering parameters
+
+Trying multiple hyper parameter values can be done with `tune_cluster()` which has a similar interface as `tune_grid()`
+
+```{r}
+#| cache: true
+kmeans_wflow <- kmeans_wflow %>%
+  update_model(kmeans_spec %>% set_args(num_clusters = tune()))
+
+grid <- tibble(num_clusters = 1:20)
+
+kmeans_res <- tune_cluster(kmeans_wflow, resamples = ad_folds, grid = grid)
+```
+
+```{r}
+collect_metrics(kmeans_res)
+```
+
+
+## Tuning clustering parameters
+
+
+```{r}
+#| out-width: '60%'
+#| fig-width: 6
+#| fig-height: 4.25
+#| fig-align: 'center'
+autoplot(kmeans_res, metric = "tot_wss")
+```
+
+##  Thanks!
+
+We want to thank our outside collaborators: Qiushi Yan, Erin LeDell, Tomas Fryda, and Kelly Bodwin. 
+
+Thanks to the r-lib, tidymodels, and tidyverse teams at ~~Rstudio~~ Posit PBC
+
+These slides are at [`https://github.com/topepo/2022-r-pharma`](https://github.com/topepo/2022-r-pharma).
+
+Learn more about tidymodels at
+
+ * [`tmwr.org`](https://www.tmwr.org)
+ * [`tidymodels.org`](https://www.tidymodels.org)
+
