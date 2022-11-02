@@ -133,7 +133,6 @@ predict(cox_fit, time_to_million[selected_rows, ], type = "time")
 ## Predict survival probability
 
 ```{r}
-
 pred <- predict(cox_fit, time_to_million[selected_rows, ], type = "survival", time = at_weeks)
 pred
 ```
@@ -205,13 +204,13 @@ We have more to add:
 
 ## Changes
 
--   new parsnip `'h2o'` engine for many models.
+-   New parsnip `'h2o'` engine for many models.
 
     -   See [here](https://agua.tidymodels.org/articles/agua.html) for a complete list.
 
 -   The interactions between H2O and tidymodels are minimized so that there are few expensive data transfer penalties.
 
--   We've added som wrappers around H2O functions that make it easier to use within tidymodels.
+-   We've added some wrappers around H2O functions that make it easier to use within tidymodels.
 
 ## Fit models on the H2O server
 
@@ -368,7 +367,7 @@ autoplot(auto_fit, type = "rank", metric = "roc_auc")
 
 ## Overview
 
--   tidymodels not support clustering models with addition of tidyclust (soon to be on CRAN)
+-   tidymodels now support clustering models with addition of tidyclust (soon to be on CRAN)
 
 -   Specify, fit, predict and evaluate clustering models
 
@@ -441,7 +440,7 @@ autoplot(kmeans_res, metric = "tot_wss")
 
 We want to thank our outside collaborators: Qiushi Yan, Erin LeDell, Tomas Fryda, and Kelly Bodwin.
 
-Thanks to the r-lib, tidymodels, and tidyverse teams at ~~Rstudio~~ Posit PBC
+Thanks to the r-lib, tidymodels, and tidyverse teams at ~~RStudio~~ Posit PBC
 
 These slides are at [`https://topepo.github.io/2022-r-pharma`](https://topepo.github.io/2022-r-pharma).
 
