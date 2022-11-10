@@ -369,7 +369,7 @@ autoplot(auto_fit, type = "rank", metric = "roc_auc")
 
 -   tidymodels now support clustering models with addition of tidyclust (soon to be on CRAN)
 
--   Specify, fit, predict and evaluate clustering models
+-   Specify, estimate, predict, and evaluate clustering models
 
 -   Learning tidyclust should be a breeze if you are already familiar with tidymodels
 
@@ -399,6 +399,8 @@ ad_rec <- ad_train %>%
   step_zv(all_predictors()) %>% 
   step_normalize(all_predictors())
 ```
+
+## Fitting clustering models
 
 A workflow object binds the pre-processor and the model together for one fitting interface.
 

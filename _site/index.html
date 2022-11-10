@@ -724,12 +724,12 @@ Max Kuhn (Posit PBC)<br>Hannah Frick (Posit PBC)<br>Emil Hvitfeldt (Posit PBC)<b
 <section id="changes" class="slide level2">
 <h2>Changes</h2>
 <ul>
-<li><p>new parsnip <code>'h2o'</code> engine for many models.</p>
+<li><p>New parsnip <code>'h2o'</code> engine for many models.</p>
 <ul>
 <li>See <a href="https://agua.tidymodels.org/articles/agua.html">here</a> for a complete list.</li>
 </ul></li>
 <li><p>The interactions between H2O and tidymodels are minimized so that there are few expensive data transfer penalties.</p></li>
-<li><p>We’ve added som wrappers around H2O functions that make it easier to use within tidymodels.</p></li>
+<li><p>We’ve added some wrappers around H2O functions that make it easier to use within tidymodels.</p></li>
 </ul>
 </section>
 <section id="fit-models-on-the-h2o-server" class="slide level2">
@@ -969,8 +969,8 @@ Max Kuhn (Posit PBC)<br>Hannah Frick (Posit PBC)<br>Emil Hvitfeldt (Posit PBC)<b
 <section id="overview" class="slide level2">
 <h2>Overview</h2>
 <ul>
-<li><p>tidymodels not support clustering models with addition of tidyclust (soon to be on CRAN)</p></li>
-<li><p>Specify, fit, predict and evaluate clustering models</p></li>
+<li><p>tidymodels now support clustering models with addition of tidyclust (soon to be on CRAN)</p></li>
+<li><p>Specify, estimate, predict, and evaluate clustering models</p></li>
 <li><p>Learning tidyclust should be a breeze if you are already familiar with tidymodels</p></li>
 </ul>
 </section>
@@ -1005,6 +1005,9 @@ Max Kuhn (Posit PBC)<br>Hannah Frick (Posit PBC)<br>Emil Hvitfeldt (Posit PBC)<b
 <span id="cb22-7"><a href="#cb22-7"></a>  <span class="fu">step_zv</span>(<span class="fu">all_predictors</span>()) <span class="sc">%&gt;%</span> </span>
 <span id="cb22-8"><a href="#cb22-8"></a>  <span class="fu">step_normalize</span>(<span class="fu">all_predictors</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
+</section>
+<section id="fitting-clustering-models" class="slide level2">
+<h2>Fitting clustering models</h2>
 <p>A workflow object binds the pre-processor and the model together for one fitting interface.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb23"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1"></a>kmeans_wflow <span class="ot">&lt;-</span> <span class="fu">workflow</span>(ad_rec, kmeans_spec)</span>
@@ -1117,7 +1120,7 @@ Max Kuhn (Posit PBC)<br>Hannah Frick (Posit PBC)<br>Emil Hvitfeldt (Posit PBC)<b
 <section id="thanks" class="slide level2">
 <h2>Thanks!</h2>
 <p>We want to thank our outside collaborators: Qiushi Yan, Erin LeDell, Tomas Fryda, and Kelly Bodwin.</p>
-<p>Thanks to the r-lib, tidymodels, and tidyverse teams at <del>Rstudio</del> Posit PBC</p>
+<p>Thanks to the r-lib, tidymodels, and tidyverse teams at <del>RStudio</del> Posit PBC</p>
 <p>These slides are at <a href="https://github.com/topepo/2022-r-pharma"><code>https://github.com/topepo/2022-r-pharma</code></a>.</p>
 <p>Learn more about tidymodels at</p>
 <ul>
